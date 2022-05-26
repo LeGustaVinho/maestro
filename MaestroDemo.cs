@@ -1,12 +1,13 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using System.Threading.Tasks;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace LegendaryTools.Systems.Maestro
 {
-    public class BaseModule: IOrchestrable
+    public class BaseModule: IOrchestrableDependable
     {
+        public IOrchestrable[] Dependencies { get; set; } = Array.Empty<IOrchestrable>();
         public int TimeOut => 2;
 
         public async Task OrchestrableTask()
@@ -14,9 +15,18 @@ namespace LegendaryTools.Systems.Maestro
             await Task.Delay(Mathf.RoundToInt(Random.Range(0.25f, 1.1f) * 1000));
         }
     }
-    
+
     public class ModuleA : BaseModule
-    { }
+    {
+        public ModuleA(ModuleB b, ModuleC c, ModuleH h, ModuleI i)
+        {
+            Dependencies = new IOrchestrable[4];
+            Dependencies[0] = b;
+            Dependencies[1] = c;
+            Dependencies[2] = h;
+            Dependencies[3] = i;
+        }
+    }
     
     public class ModuleB : BaseModule
     { }
@@ -54,7 +64,6 @@ namespace LegendaryTools.Systems.Maestro
         
         async void Start()
         {
-            ModuleA moduleA = new ModuleA();
             ModuleB moduleB = new ModuleB();
             ModuleC moduleC = new ModuleC();
             ModuleD moduleD = new ModuleD();
@@ -65,8 +74,9 @@ namespace LegendaryTools.Systems.Maestro
             ModuleI moduleI = new ModuleI();
             ModuleJ moduleJ = new ModuleJ();
             ModuleK moduleK = new ModuleK();
+            ModuleA moduleA = new ModuleA(moduleB, moduleC, moduleH, moduleI);
 
-            Maestro.Add(moduleA, moduleB, moduleC, moduleI);
+            Maestro.AddWithDependency(moduleA);
             Maestro.Add(moduleB, moduleD, moduleE);
             Maestro.Add(moduleD, moduleG);
             Maestro.Add(moduleE, moduleJ);

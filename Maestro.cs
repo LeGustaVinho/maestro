@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -12,6 +13,11 @@ namespace LegendaryTools.Systems.Maestro
         Task OrchestrableTask();
     }
 
+    public interface IOrchestrableDependable : IOrchestrable
+    {
+        IOrchestrable[] Dependencies { get; set; }
+    }
+
     public class Maestro
     {
         public MaestroTree Tree { private set; get; }
@@ -23,6 +29,7 @@ namespace LegendaryTools.Systems.Maestro
 
         private class MaestroRoot : IOrchestrable
         {
+            public IOrchestrable[] Dependencies => Array.Empty<IOrchestrable>();
             public int TimeOut => 1;
 
             public async Task OrchestrableTask()
@@ -72,6 +79,14 @@ namespace LegendaryTools.Systems.Maestro
             }
         }
 
+        public void AddWithDependency(params IOrchestrableDependable[] orchestrableObjects)
+        {
+            foreach (IOrchestrableDependable orchestrableObject in orchestrableObjects)
+            {
+                Add(orchestrableObject, orchestrableObject.Dependencies);    
+            }
+        }
+        
         public void AddManyWithNoDependency(params IOrchestrable[] orchestrableObjects)
         {
             foreach (IOrchestrable orchestrableObject in orchestrableObjects)
