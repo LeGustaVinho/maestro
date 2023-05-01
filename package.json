@@ -1,0 +1,20 @@
+{
+  "name": "com.legustavinho.legendary-tools-maestro",
+  "displayName": "Legendary Tools - Maestro",
+  "version": "1.0.0",
+  "unity": "2019.4",
+  "type": "library",
+  "keywords": [],
+  "category": "Extensions",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LeGustaVinho/graphs.git"
+  },
+  "dependencies": {
+    "com.legustavinho.legendary-tools-graphs": "https://github.com/LeGustaVinho/graphs.git"
+  },
+  "author": {
+    "name": "LeGustaVinho",
+    "email": "not available"
+  }
+}
