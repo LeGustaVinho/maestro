@@ -1,4 +1,4 @@
-# Mastro
+# Maestro
 
 **Maestro** is a dependency tree resolver
 
