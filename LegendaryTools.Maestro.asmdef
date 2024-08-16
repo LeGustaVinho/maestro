@@ -2,7 +2,9 @@
     "name": "LegendaryTools.Maestro",
     "rootNamespace": "",
     "references": [
-        "GUID:51acd6bebff69ec40a3d8b5d98aa515b"
+        "GUID:51acd6bebff69ec40a3d8b5d98aa515b",
+        "GUID:d962d0b942a7fff4092f4dbd41f1907f",
+        "GUID:24044e8960e64a144b7a05351e2cc6ea"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

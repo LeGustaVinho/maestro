@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Threading.Tasks;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -10,9 +11,10 @@ namespace LegendaryTools.Systems.Maestro
         public IOrchestrable[] Dependencies { get; set; } = Array.Empty<IOrchestrable>();
         public int TimeOut => 2;
 
-        public async Task OrchestrableTask()
+        public IEnumerator OrchestrableTask()
         {
-            await Task.Delay(Mathf.RoundToInt(Random.Range(0.25f, 1.1f) * 1000));
+            yield return new WaitForSeconds(Mathf.RoundToInt(Random.Range(0.25f, 1.1f)));
+            throw new Exception("Test");
         }
     }
 
@@ -62,7 +64,7 @@ namespace LegendaryTools.Systems.Maestro
     {
         public Maestro Maestro = new Maestro();
         
-        async void Start()
+        IEnumerator Start()
         {
             ModuleB moduleB = new ModuleB();
             ModuleC moduleC = new ModuleC();
@@ -75,7 +77,7 @@ namespace LegendaryTools.Systems.Maestro
             ModuleJ moduleJ = new ModuleJ();
             ModuleK moduleK = new ModuleK();
             ModuleA moduleA = new ModuleA(moduleB, moduleC, moduleH, moduleI);
-
+            
             Maestro.AddWithDependency(moduleA);
             Maestro.Add(moduleB, moduleD, moduleE);
             Maestro.Add(moduleD, moduleG);
@@ -86,7 +88,7 @@ namespace LegendaryTools.Systems.Maestro
 
             Maestro.OnFinished += OnMaestroFinished;
             
-            await Maestro.Start();
+            yield return Maestro.Start();
             
             Debug.Log("Finished");
         }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using LegendaryTools.Graph;
@@ -14,7 +15,7 @@ namespace LegendaryTools.Systems.Maestro
         
         public MaestroTree(MaestroBranchBase rootNode) : base(rootNode)
         {
-            rootNode.OnTaskCompleted += OnTreeCompleted;
+            //rootNode.OnTaskCompleted += OnTreeCompleted;
         }
 
         public MaestroTree(MaestroBranchBase rootNode, MaestroBranchBase parentNode) : base(rootNode, parentNode)
@@ -25,17 +26,17 @@ namespace LegendaryTools.Systems.Maestro
         {
             IsRunning = false;
             IsCompleted = success;
-            StartOrRootNode.OnTaskCompleted -= OnTreeCompleted;
+            //StartOrRootNode.OnTaskCompleted -= OnTreeCompleted;
             
             OnCompleted?.Invoke(this);
         }
         
-        private async void OnTaskCompleted(MaestroBranchBase branch, bool success)
+        private void OnTaskCompleted(MaestroBranchBase branch, bool success)
         {
             if (success)
             {
-                branch.OnTaskCompleted -= OnTaskCompleted;
-                await RunBranchesWithPrerequisites();
+                //branch.OnTaskCompleted -= OnTaskCompleted;
+                //await RunBranchesWithPrerequisites();
             }
             else
             {
@@ -43,7 +44,7 @@ namespace LegendaryTools.Systems.Maestro
             }
         }
         
-        public async Task Start()
+        public IEnumerator Start()
         {
             if (!IsRunning)
             {
@@ -55,42 +56,35 @@ namespace LegendaryTools.Systems.Maestro
                 {
                     if (!branch.IsReference)
                     {
-                        branch.OnTaskCompleted += OnTaskCompleted;
+                        //branch.OnTaskCompleted += OnTaskCompleted;
                     }
                 }
 
-                await RunBranchesWithPrerequisites();
+                yield return RunBranchesWithPrerequisites();
             }
         }
 
-        private async Task RunBranchesWithPrerequisites()
+        private IEnumerator RunBranchesWithPrerequisites()
         {
             List<MaestroBranchBase> branchesToRun =
                 StartOrRootNode.FindAll(item => !item.IsRunning &&
                                                 !item.IsCompleted &&
                                                 !item.HasError &&
                                                 item.HasPrerequisites);
-
-            if (branchesToRun.Count > 0)
+            do
             {
-                List<Task> tasks = new List<Task>(branchesToRun.Count);
                 foreach (MaestroBranchBase branchToRun in branchesToRun)
                 {
-                    tasks.Add(branchToRun.RunOrchestrableTask());
+                    yield return branchToRun.RunOrchestrableTask();
                 }
+                
+                branchesToRun =
+                    StartOrRootNode.FindAll(item => !item.IsRunning &&
+                                                    !item.IsCompleted &&
+                                                    !item.HasError &&
+                                                    item.HasPrerequisites);
 
-                await Task.WhenAll(tasks);
-            }
-            else
-            {
-                if (!StartOrRootNode.IsRunning &&
-                    !StartOrRootNode.IsCompleted &&
-                    !StartOrRootNode.HasError &&
-                    StartOrRootNode.HasPrerequisites)
-                {
-                    await StartOrRootNode.RunOrchestrableTask();
-                }
-            }
+            } while (branchesToRun.Count > 0);
         }
     }
 }

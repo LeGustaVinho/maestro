@@ -10,7 +10,7 @@ namespace LegendaryTools.Systems.Maestro
     {
         int TimeOut { get; }
         
-        Task OrchestrableTask();
+        IEnumerator OrchestrableTask();
     }
 
     public interface IOrchestrableDependable : IOrchestrable
@@ -32,9 +32,9 @@ namespace LegendaryTools.Systems.Maestro
             public IOrchestrable[] Dependencies => Array.Empty<IOrchestrable>();
             public int TimeOut => 1;
 
-            public async Task OrchestrableTask()
+            public IEnumerator OrchestrableTask()
             {
-                await Task.Yield();
+                yield return new WaitForEndOfFrame();
             }
         }
 
@@ -96,7 +96,7 @@ namespace LegendaryTools.Systems.Maestro
             }
         }
 
-        public async Task Start()
+        public IEnumerator Start()
         {
             //Make all parentless branchs to root node
             foreach (KeyValuePair<IOrchestrable, MaestroBranch> pair in objectBranchMap)
@@ -111,11 +111,7 @@ namespace LegendaryTools.Systems.Maestro
 
             Tree.OnCompleted += OnMaestroTreeCompleted;
 
-            await Tree.Start();
-            while (Tree.IsRunning)
-            {
-                await Task.Delay(25);
-            }
+            yield return Tree.Start();
             
             Tree.OnCompleted -= OnMaestroTreeCompleted;
         }

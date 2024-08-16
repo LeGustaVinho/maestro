@@ -1,7 +1,9 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
-using System.Threading.Tasks;
 using LegendaryTools.Graph;
+using UnityEngine;
 using Debug = UnityEngine.Debug;
 
 namespace LegendaryTools.Systems.Maestro
@@ -20,43 +22,15 @@ namespace LegendaryTools.Systems.Maestro
 
         public virtual event Action<MaestroBranchBase, bool> OnTaskCompleted;
 
-        public virtual async Task RunOrchestrableTask()
+        public virtual IEnumerator RunOrchestrableTask()
         {
-            if (!HasPrerequisites || IsCompleted || IsRunning || HasError) return;
+            if (!HasPrerequisites || IsCompleted || IsRunning || HasError) yield break;
             
             IsRunning = true;
             Stopwatch sw = new Stopwatch();
             sw.Start();
 
-            try
-            {
-                if (OrchestrableObject.TimeOut > 0)
-                {
-                    Task orchestrableTask = OrchestrableObject.OrchestrableTask();
-                    if (await Task.WhenAny(orchestrableTask, Task.Delay(OrchestrableObject.TimeOut * 1000)) !=
-                        orchestrableTask)
-                    {
-                        throw new TimeoutException(
-                            $"{OrchestrableObject.GetType()} has time out while doing orchestrable task.");
-                    }
-                }
-                else
-                {
-                    await OrchestrableObject.OrchestrableTask();
-                }
-            }
-            catch (Exception e)
-            {
-                IsRunning = false;
-                HasError = true;
-                Error = e;
-                Debug.LogError($"[MaestroBranch:RunOrchestrableTask] -> {OrchestrableObject.GetType()} got a error while doing a task.");
-                Debug.LogException(e);
-                sw.Stop();
-                TimeSpentMilliseconds = sw.Elapsed.Milliseconds;
-                OnTaskCompleted?.Invoke(this, false);
-                return;
-            }
+            yield return OrchestrableObject.OrchestrableTask();
 
             IsRunning = false;
             IsCompleted = true;
@@ -98,9 +72,9 @@ namespace LegendaryTools.Systems.Maestro
             remove => MaestroBranch.OnTaskCompleted -= value;
         }
 
-        public override async Task RunOrchestrableTask()
+        public override IEnumerator RunOrchestrableTask()
         {
-            await MaestroBranch.RunOrchestrableTask();
+            yield return MaestroBranch.RunOrchestrableTask();
         }
         
         public MaestroReferenceBranch(MaestroBranch maestroBranch)
