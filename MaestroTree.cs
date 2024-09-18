@@ -11,6 +11,7 @@ namespace LegendaryTools.Systems.Maestro
         public bool IsCompleted { get; private set; }
         
         public event Action<MaestroTree> OnCompleted;
+        public event Action<MaestroBranchBase, bool> OnBranchFinished;
         
         public MaestroTree(MaestroBranchBase rootNode) : base(rootNode)
         {
@@ -34,11 +35,13 @@ namespace LegendaryTools.Systems.Maestro
         {
             if (success)
             {
+                OnBranchFinished?.Invoke(branch, true);
                 branch.OnTaskCompleted -= OnTaskCompleted;
                 await RunBranchesWithPrerequisites();
             }
             else
             {
+                OnBranchFinished?.Invoke(branch, false);
                 OnTreeCompleted(branch, false);
             }
         }

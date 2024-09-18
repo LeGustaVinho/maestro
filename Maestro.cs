@@ -25,6 +25,11 @@ namespace LegendaryTools.Systems.Maestro
             new Dictionary<IOrchestrable, MaestroBranch>();
 
         public event Action<Maestro, bool> OnFinished;
+        public event Action<MaestroBranchBase, bool> OnBranchFinished
+        {
+            add => Tree.OnBranchFinished += value;
+            remove => Tree.OnBranchFinished -= value;
+        }
 
         private class MaestroRoot : IOrchestrable
         {
