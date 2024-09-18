@@ -29,7 +29,7 @@ namespace LegendaryTools.Systems.Maestro
         private class MaestroRoot : IOrchestrable
         {
             public IOrchestrable[] Dependencies => Array.Empty<IOrchestrable>();
-            public int TimeOut => 1;
+            public int TimeOut => 0;
 
             public async Task OrchestrableTask()
             {
