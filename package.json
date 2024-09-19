@@ -1,7 +1,7 @@
 {
   "name": "com.legustavinho.legendary-tools-maestro",
   "displayName": "Legendary Tools - Maestro",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "unity": "2019.4",
   "type": "library",
   "keywords": [],
@@ -13,7 +13,7 @@
   "dependencies": {
     "com.legustavinho.legendary-tools-graphs": "1.0.2",
     "com.legustavinho.legendary-tools-singleton": "1.0.2",
-    "com.legustavinho.legendary-tools-common": "1.0.11"
+    "com.legustavinho.legendary-tools-common": "1.1.1"
   },
   "author": {
     "name": "LeGustaVinho",

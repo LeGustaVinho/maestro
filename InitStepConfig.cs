@@ -8,7 +8,7 @@ namespace LegendaryTools.Systems.Maestro
 #if ODIN_INSPECTOR
         Sirenix.OdinInspector.SerializedScriptableObject,
 #else
-        ScriptableObject,
+        UnityEngine.ScriptableObject,
 #endif
         IOrchestrableDependable, IDisposable
     {
@@ -16,7 +16,7 @@ namespace LegendaryTools.Systems.Maestro
         [Sirenix.OdinInspector.ShowInInspector]
         public int TimeOut { set; get; }
 #else
-        [SerializeField] private int timeOut;
+        [UnityEngine.SerializeField] private int timeOut;
         public int TimeOut
         {
             set => timeOut = value;
