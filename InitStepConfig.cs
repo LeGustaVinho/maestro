@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace LegendaryTools.Systems.Maestro
@@ -9,7 +10,7 @@ namespace LegendaryTools.Systems.Maestro
 #else
         ScriptableObject,
 #endif
-        IOrchestrableDependable
+        IOrchestrableDependable, IDisposable
     {
 #if ODIN_INSPECTOR
         [Sirenix.OdinInspector.ShowInInspector]
@@ -39,6 +40,10 @@ namespace LegendaryTools.Systems.Maestro
         
         public InitStepConfig[] StepDependencies;
 
-        public abstract Task OrchestrableTask();
+        public abstract Task<bool> OrchestrableTask();
+        public virtual void Dispose()
+        {
+            
+        }
     }
 }

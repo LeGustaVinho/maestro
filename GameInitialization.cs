@@ -4,31 +4,44 @@ namespace LegendaryTools.Systems.Maestro
 {
     public class GameInitialization : SingletonBehaviour<GameInitialization>
     {
+        public bool Verbose;
 #if ODIN_INSPECTOR
         [Sirenix.OdinInspector.ShowInInspector]
 #endif
         public bool IsInitialized { private set; get; }
+        public bool AutoDisposeOnDestroy;
         public InitStepListingConfig InitStepListing;
         public event Action OnBeforeInitialize;
         public event Action OnInitialize;
+
+        public Maestro Maestro { get; private set; }
         
         protected override async void Start()
         {
             base.Start();
+            Maestro = new Maestro(Verbose);
+            
             BeforeInitialize();
             OnBeforeInitialize?.Invoke();
             
-            Maestro maestro = new Maestro();
             foreach (InitStepConfig initStepConfig in InitStepListing.Configs)
             {
-                maestro.AddWithDependency(initStepConfig);
+                Maestro.AddWithDependency(initStepConfig);
             }
             
-            await maestro.Start();
+            await Maestro.Start();
             IsInitialized = true;
             
             AfterInitialize();
             OnInitialize?.Invoke();
+        }
+
+        protected virtual void OnDestroy()
+        {
+            if (AutoDisposeOnDestroy)
+            {
+                InitStepListing.Dispose();
+            }
         }
 
         protected virtual void BeforeInitialize()

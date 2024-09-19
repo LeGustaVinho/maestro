@@ -9,7 +9,7 @@ namespace LegendaryTools.Systems.Maestro
     {
         int TimeOut { get; }
         
-        Task OrchestrableTask();
+        Task<bool> OrchestrableTask();
     }
 
     public interface IOrchestrableDependable : IOrchestrable
@@ -19,6 +19,7 @@ namespace LegendaryTools.Systems.Maestro
 
     public class Maestro
     {
+        public bool Verbose;
         public MaestroTree Tree { private set; get; }
 
         private readonly Dictionary<IOrchestrable, MaestroBranch> objectBranchMap =
@@ -36,15 +37,17 @@ namespace LegendaryTools.Systems.Maestro
             public IOrchestrable[] Dependencies => Array.Empty<IOrchestrable>();
             public int TimeOut => 0;
 
-            public async Task OrchestrableTask()
+            public async Task<bool> OrchestrableTask()
             {
                 await Task.Yield();
+                return true;
             }
         }
 
-        public Maestro()
+        public Maestro(bool verbose = false)
         {
-            Tree = new MaestroTree(new MaestroBranch(new MaestroRoot()));
+            Verbose = verbose;
+            Tree = new MaestroTree(new MaestroBranch(new MaestroRoot()), Verbose);
         }
 
         public void Add(IOrchestrable orchestrableObject, params IOrchestrable[] dependencies)

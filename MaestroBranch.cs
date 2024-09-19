@@ -28,21 +28,30 @@ namespace LegendaryTools.Systems.Maestro
             Stopwatch sw = new Stopwatch();
             sw.Start();
 
+            bool orchestrableTaskResult = false;
             try
             {
                 if (OrchestrableObject.TimeOut > 0)
                 {
-                    Task orchestrableTask = OrchestrableObject.OrchestrableTask();
+                    Task<bool> orchestrableTask = OrchestrableObject.OrchestrableTask();
                     if (await Task.WhenAny(orchestrableTask, Task.Delay(OrchestrableObject.TimeOut * 1000)) !=
                         orchestrableTask)
                     {
+                        orchestrableTaskResult = false;
                         throw new TimeoutException(
                             $"{OrchestrableObject.GetType()} has time out while doing orchestrable task.");
                     }
+
+                    orchestrableTaskResult = orchestrableTask.Result;
                 }
                 else
                 {
-                    await OrchestrableObject.OrchestrableTask();
+                    orchestrableTaskResult = await OrchestrableObject.OrchestrableTask();
+                }
+
+                if (!orchestrableTaskResult)
+                {
+                    Debug.LogError($"[MaestroBranch:RunOrchestrableTask] -> {OrchestrableObject.GetType()} dependencies were not met in order to complete the task.");
                 }
             }
             catch (Exception e)
@@ -63,7 +72,8 @@ namespace LegendaryTools.Systems.Maestro
             sw.Stop();
             TimeSpentMilliseconds = sw.Elapsed.Milliseconds;
             
-            Debug.Log($"[MaestroBranch:RunOrchestrableTask] -> {OrchestrableObject.GetType()} finished task, time: {sw.Elapsed.TotalSeconds} seconds");
+            if(Owner.Verbose)
+                Debug.Log($"[MaestroBranch:RunOrchestrableTask] -> {OrchestrableObject.GetType()} finished task, time: {sw.Elapsed.TotalSeconds} seconds");
             
             OnTaskCompleted?.Invoke(this, true);
         }

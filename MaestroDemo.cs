@@ -10,9 +10,10 @@ namespace LegendaryTools.Systems.Maestro
         public IOrchestrable[] Dependencies { get; set; } = Array.Empty<IOrchestrable>();
         public int TimeOut => 2;
 
-        public async Task OrchestrableTask()
+        public async Task<bool> OrchestrableTask()
         {
             await Task.Delay(Mathf.RoundToInt(Random.Range(0.25f, 1.1f) * 1000));
+            return true;
         }
     }
 

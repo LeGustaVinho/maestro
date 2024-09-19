@@ -7,19 +7,22 @@ namespace LegendaryTools.Systems.Maestro
 {
     public class MaestroTree : Tree<MaestroTree, MaestroBranchBase>
     {
+        public bool Verbose;
         public bool IsRunning { get; private set; }
         public bool IsCompleted { get; private set; }
         
         public event Action<MaestroTree> OnCompleted;
         public event Action<MaestroBranchBase, bool> OnBranchFinished;
         
-        public MaestroTree(MaestroBranchBase rootNode) : base(rootNode)
+        public MaestroTree(MaestroBranchBase rootNode, bool verbose) : base(rootNode)
         {
+            Verbose = verbose;
             rootNode.OnTaskCompleted += OnTreeCompleted;
         }
 
-        public MaestroTree(MaestroBranchBase rootNode, MaestroBranchBase parentNode) : base(rootNode, parentNode)
+        public MaestroTree(MaestroBranchBase rootNode, MaestroBranchBase parentNode, bool verbose) : base(rootNode, parentNode)
         {
+            Verbose = verbose;
         }
 
         private void OnTreeCompleted(MaestroBranchBase branch, bool success)
