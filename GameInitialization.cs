@@ -1,12 +1,13 @@
 ﻿using System;
 
-namespace LegendaryTools.Systems.Maestro
+namespace LegendaryTools.Maestro
 {
     public class GameInitialization : SingletonBehaviour<GameInitialization>
     {
         public bool Verbose;
 #if ODIN_INSPECTOR
         [Sirenix.OdinInspector.ShowInInspector]
+        [Sirenix.OdinInspector.ReadOnly]
 #endif
         public bool IsInitialized { private set; get; }
         public bool AutoDisposeOnDestroy;
@@ -26,7 +27,7 @@ namespace LegendaryTools.Systems.Maestro
             
             foreach (InitStepConfig initStepConfig in InitStepListing.Configs)
             {
-                Maestro.AddWithDependency(initStepConfig);
+                Maestro.Add(initStepConfig);
             }
             
             await Maestro.Start();

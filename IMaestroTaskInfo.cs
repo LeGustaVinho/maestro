@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace LegendaryTools.Systems.MaestroV2
+namespace LegendaryTools.Maestro
 {
     public interface IMaestroTaskInfo
     {

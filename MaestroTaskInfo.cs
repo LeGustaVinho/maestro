@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using Debug = UnityEngine.Debug;
 
-namespace LegendaryTools.Systems.MaestroV2
+namespace LegendaryTools.Maestro
 {
     public class MaestroTaskInfo : IMaestroTaskInfo
     {

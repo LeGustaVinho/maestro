@@ -1,4 +1,4 @@
-namespace LegendaryTools.Systems.MaestroV2
+namespace LegendaryTools.Maestro
 {
     public interface IMaestroTaskWithDependency : IMaestroTask
     {

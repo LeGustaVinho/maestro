@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using UnityEngine;
 
-namespace LegendaryTools.Systems.MaestroV2
+namespace LegendaryTools.Maestro
 {
     public abstract class InitStepConfig : 
 #if ODIN_INSPECTOR
@@ -13,28 +14,31 @@ namespace LegendaryTools.Systems.MaestroV2
         IMaestroTaskWithDependency, IDisposable
     {
 #if ODIN_INSPECTOR
+        [HideInInspector]
+#endif
+        [SerializeField] private int timeOut;
+#if ODIN_INSPECTOR
         [Sirenix.OdinInspector.ShowInInspector]
-        public int TimeOut { set; get; }
-#else
-        [UnityEngine.SerializeField] private int timeOut;
+#endif
         public int TimeOut
         {
             set => timeOut = value;
             get => timeOut;
         }
-#endif
         
 #if ODIN_INSPECTOR
+        [HideInInspector]
+#endif
+        [SerializeField] private bool threadSafe;
+#if ODIN_INSPECTOR
         [Sirenix.OdinInspector.ShowInInspector]
-        public bool ThreadSafe { set; get; }
-#else
-        [UnityEngine.SerializeField] private bool threadSafe;
+#endif
         public bool ThreadSafe
         {
             set => threadSafe = value;
             get => threadSafe;
         }
-#endif
+
         public IMaestroTask[] Dependencies 
         {
             get

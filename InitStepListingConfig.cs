@@ -1,9 +1,9 @@
 ﻿using System;
 using UnityEngine;
 
-namespace LegendaryTools.Systems.Maestro
+namespace LegendaryTools.Maestro
 {
-    [CreateAssetMenu(menuName = "Tools/Maestro/InitStepListingConfig")]
+    [CreateAssetMenu(menuName = "Tools/Maestro/InitStepListingConfigV2")]
     public class InitStepListingConfig : ConfigListing<InitStepConfig>, IDisposable
     {
         public void Dispose()

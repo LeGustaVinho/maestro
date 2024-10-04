@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace LegendaryTools.Systems.MaestroV2
+namespace LegendaryTools.Maestro
 {
     public interface IMaestro : IDisposable
     {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
-using LegendaryTools.Systems.MaestroV2;
+using LegendaryTools.Maestro;
 using NUnit.Framework;
 
 namespace MaestroTests

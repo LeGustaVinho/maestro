@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace LegendaryTools.Systems.MaestroV2
+namespace LegendaryTools.Maestro
 {
     public class Maestro :  IMaestro
     {
