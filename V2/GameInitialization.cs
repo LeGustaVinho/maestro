@@ -7,6 +7,7 @@ namespace LegendaryTools.Systems.MaestroV2
         public bool Verbose;
 #if ODIN_INSPECTOR
         [Sirenix.OdinInspector.ShowInInspector]
+        [Sirenix.OdinInspector.ReadOnly]
 #endif
         public bool IsInitialized { private set; get; }
         public bool AutoDisposeOnDestroy;
