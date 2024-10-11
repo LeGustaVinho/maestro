@@ -43,8 +43,11 @@ namespace LegendaryTools.Maestro
                     throw new InvalidOperationException($"{task.GetType()} cannot be added because a circular reference would occur");
             }
 
-            MaestroTaskInfo maestroTaskInfo = new MaestroTaskInfo(task, dependencyTasks.ToArray());
-            maestroNodeMapping.Add(task, maestroTaskInfo);
+            if (!maestroNodeMapping.ContainsKey(task))
+            {
+                MaestroTaskInfo maestroTaskInfo = new MaestroTaskInfo(task, dependencyTasks.ToArray());
+                maestroNodeMapping.Add(task, maestroTaskInfo);
+            }
         }
 
         public void Add(params IMaestroTaskWithDependency[] tasks)
