@@ -198,9 +198,9 @@ namespace MaestroTests
 
             // Use reflection to access private maestroNodeMapping
             FieldInfo field =
-                typeof(Maestro).GetField("maestroNodeMapping", BindingFlags.NonPublic | BindingFlags.Instance);
-            Dictionary<IMaestroTask, MaestroTaskInfo> mapping =
-                field.GetValue(maestro) as Dictionary<IMaestroTask, MaestroTaskInfo>;
+                typeof(Maestro).GetField("maestroTaskDependencyMap", BindingFlags.NonPublic | BindingFlags.Instance);
+            Dictionary<IMaestroTask, List<IMaestroTask>> mapping =
+                field.GetValue(maestro) as Dictionary<IMaestroTask, List<IMaestroTask>>;
 
             // Assert
             Assert.IsNotNull(mapping, "Maestro should have a mapping dictionary.");

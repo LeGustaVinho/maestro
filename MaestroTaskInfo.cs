@@ -17,10 +17,10 @@ namespace LegendaryTools.Maestro
         public float TimeSpentMilliseconds { get; private set; }
         public IMaestroTask MaestroTaskObject { get; private set; }
         public virtual bool HasPrerequisites =>
-            dependencies.Count == 0 || dependencies.TrueForAll(item => item.IsCompleted);
+            DependenciesInternal.Count == 0 || DependenciesInternal.TrueForAll(item => item.IsCompleted);
 
-        public List<MaestroTaskInfo> Dependencies => new List<MaestroTaskInfo>(dependencies);
-        private readonly List<MaestroTaskInfo> dependencies = new List<MaestroTaskInfo>();
+        public List<MaestroTaskInfo> Dependencies => new List<MaestroTaskInfo>(DependenciesInternal);
+        internal readonly List<MaestroTaskInfo> DependenciesInternal = new List<MaestroTaskInfo>();
 
         public event Action<MaestroTaskInfo, bool> OnTaskCompleted;
 
@@ -32,7 +32,7 @@ namespace LegendaryTools.Maestro
         public MaestroTaskInfo(IMaestroTask maestroTaskObject, params MaestroTaskInfo[] dependencies)
         {
             MaestroTaskObject = maestroTaskObject;
-            this.dependencies.AddRange(dependencies);
+            this.DependenciesInternal.AddRange(dependencies);
         }
 
         public async Task DoTaskOperation()

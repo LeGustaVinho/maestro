@@ -12,8 +12,8 @@ namespace LegendaryTools.Maestro
         public event Action<Maestro, bool> OnFinished;
         public event Action<MaestroTaskInfo, bool> OnTaskFinished;
 
-        private readonly Dictionary<IMaestroTask, MaestroTaskInfo> maestroNodeMapping =
-            new Dictionary<IMaestroTask, MaestroTaskInfo>();
+        private readonly Dictionary<IMaestroTask, List<IMaestroTask>> maestroTaskDependencyMap =
+            new Dictionary<IMaestroTask, List<IMaestroTask>>();
 
         public Maestro(bool verbose = false)
         {
@@ -22,31 +22,21 @@ namespace LegendaryTools.Maestro
 
         public void Add(IMaestroTask task, params IMaestroTask[] dependencies)
         {
-            List<MaestroTaskInfo> dependencyTasks = new List<MaestroTaskInfo>();
+            if (!maestroTaskDependencyMap.ContainsKey(task))
+            {
+                maestroTaskDependencyMap.Add(task, new List<IMaestroTask>());
+            }
+
             foreach (IMaestroTask dependency in dependencies)
             {
-                if (!maestroNodeMapping.TryGetValue(dependency, out MaestroTaskInfo mappedTask))
+                if (maestroTaskDependencyMap.TryGetValue(dependency, out List<IMaestroTask> dependencyTasks))
                 {
-                    MaestroTaskInfo newDependencyTaskInfo = new MaestroTaskInfo(dependency);
-                    maestroNodeMapping.Add(dependency, newDependencyTaskInfo);
-                    dependencyTasks.Add(newDependencyTaskInfo);
+                    if (dependencyTasks.Contains(task))
+                        throw new InvalidOperationException($"{task.GetType()} cannot be added because a circular reference would occur");
                 }
-                else
-                {
-                    dependencyTasks.Add(mappedTask);
-                }
-            }
-
-            foreach (MaestroTaskInfo dependencyTask in dependencyTasks)
-            {
-                if (dependencyTask.MaestroTaskObject == task)
-                    throw new InvalidOperationException($"{task.GetType()} cannot be added because a circular reference would occur");
-            }
-
-            if (!maestroNodeMapping.ContainsKey(task))
-            {
-                MaestroTaskInfo maestroTaskInfo = new MaestroTaskInfo(task, dependencyTasks.ToArray());
-                maestroNodeMapping.Add(task, maestroTaskInfo);
+                
+                if (!maestroTaskDependencyMap[task].Contains(dependency))
+                    maestroTaskDependencyMap[task].Add(dependency);
             }
         }
 
@@ -62,7 +52,30 @@ namespace LegendaryTools.Maestro
 
         public async Task Start()
         {
-            List<MaestroTaskInfo> allMaestroNodes = maestroNodeMapping.Values.ToList();
+            List<MaestroTaskInfo> allMaestroNodes = new List<MaestroTaskInfo>();
+            Dictionary<IMaestroTask, MaestroTaskInfo> maestroTasksLookup =
+                new Dictionary<IMaestroTask, MaestroTaskInfo>();
+            
+            foreach (KeyValuePair<IMaestroTask, List<IMaestroTask>> pair in maestroTaskDependencyMap)
+            {
+                if (!maestroTasksLookup.ContainsKey(pair.Key))
+                {
+                    MaestroTaskInfo taskInfo = new MaestroTaskInfo(pair.Key);
+                    maestroTasksLookup.Add(pair.Key, taskInfo);
+                    allMaestroNodes.Add(taskInfo);
+                }
+                foreach (IMaestroTask dependency in pair.Value)
+                {
+                    if (!maestroTasksLookup.ContainsKey(dependency))
+                    {
+                        MaestroTaskInfo dependencyInfo = new MaestroTaskInfo(dependency);
+                        maestroTasksLookup.Add(dependency, dependencyInfo);
+                        allMaestroNodes.Add(dependencyInfo);
+                    }
+                    maestroTasksLookup[pair.Key].DependenciesInternal.Add(maestroTasksLookup[dependency]);
+                }
+            }
+            
             List<MaestroTaskInfo> allReady = allMaestroNodes.FindAll(item => item.HasPrerequisites && !item.IsDone);
             bool repeat = !IsAllDone(allMaestroNodes);
             while (repeat)
@@ -114,7 +127,7 @@ namespace LegendaryTools.Maestro
         
         public void Dispose()
         {
-            maestroNodeMapping.Clear();
+            maestroTaskDependencyMap.Clear();
         }
 
         private void OnTaskCompleted(MaestroTaskInfo taskInfo, bool result)
