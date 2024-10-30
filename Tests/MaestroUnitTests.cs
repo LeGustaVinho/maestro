@@ -10,6 +10,7 @@ namespace MaestroTests
     // Fake implementation of IMaestroTask for testing purposes
     public class FakeMaestroTask : IMaestroTask
     {
+        public bool Enabled { get; } = true;
         public int TimeOut { get; set; } = 0;
         public bool ThreadSafe { get; set; } = true;
         private readonly bool _shouldSucceed;

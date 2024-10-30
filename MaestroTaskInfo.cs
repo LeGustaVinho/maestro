@@ -8,7 +8,7 @@ namespace LegendaryTools.Maestro
 {
     public class MaestroTaskInfo : IMaestroTaskInfo
     {
-        public bool Verbose;
+        public bool Enabled => MaestroTaskObject.Enabled;
         public bool IsRunning { get; private set; }
         public bool IsCompleted { get; private set; }
         public bool HasError { get; private set; }
@@ -72,7 +72,7 @@ namespace LegendaryTools.Maestro
                 }
 
                 if (!taskResult)
-                    Debug.LogError(
+                    Debugger.LogError<Maestro>(
                         $"[{nameof(MaestroTaskInfo)}:{nameof(DoTaskOperation)}] -> {MaestroTaskObject.GetType()} dependencies were not met in order to complete the task.");
             }
             catch (Exception e)
@@ -81,9 +81,9 @@ namespace LegendaryTools.Maestro
                 HasError = true;
                 IsDone = true;
                 Error = e;
-                 Debug.LogError(
+                 Debugger.LogError<Maestro>(
                      $"[{nameof(MaestroTaskInfo)}:{nameof(DoTaskOperation)}] -> {MaestroTaskObject.GetType()} got a error while doing a task.");
-                Debug.LogException(e);
+                Debugger.LogException<Maestro>(e);
                 sw.Stop();
                 TimeSpentMilliseconds = sw.Elapsed.Milliseconds;
                 OnTaskCompleted?.Invoke(this, false);
@@ -92,10 +92,9 @@ namespace LegendaryTools.Maestro
 
             sw.Stop();
             TimeSpentMilliseconds = sw.Elapsed.Milliseconds;
-
-            if (Verbose)
-                Debug.Log(
-                    $"[{nameof(MaestroTaskInfo)}:{nameof(DoTaskOperation)}] -> {MaestroTaskObject.GetType()} finished task, time: {sw.Elapsed.TotalSeconds} seconds");
+            
+            Debugger.Log<Maestro>(
+                $"[{nameof(MaestroTaskInfo)}:{nameof(DoTaskOperation)}] -> {MaestroTaskObject.GetType()} finished task, time: {sw.Elapsed.TotalSeconds} seconds");
 
             IsRunning = false;
             IsCompleted = true;

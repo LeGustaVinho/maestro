@@ -4,7 +4,6 @@ namespace LegendaryTools.Maestro
 {
     public class GameInitialization : SingletonBehaviour<GameInitialization>
     {
-        public bool Verbose;
 #if ODIN_INSPECTOR
         [Sirenix.OdinInspector.ShowInInspector]
         [Sirenix.OdinInspector.ReadOnly]
@@ -20,7 +19,7 @@ namespace LegendaryTools.Maestro
         protected override async void Start()
         {
             base.Start();
-            Maestro = new Maestro(Verbose);
+            Maestro = new Maestro();
             
             BeforeInitialize();
             OnBeforeInitialize?.Invoke();

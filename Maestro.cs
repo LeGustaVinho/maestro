@@ -8,31 +8,27 @@ namespace LegendaryTools.Maestro
 {
     public class Maestro :  IMaestro
     {
-        public bool Verbose;
         public event Action<Maestro, bool> OnFinished;
         public event Action<MaestroTaskInfo, bool> OnTaskFinished;
 
         private readonly Dictionary<IMaestroTask, List<IMaestroTask>> maestroTaskDependencyMap =
             new Dictionary<IMaestroTask, List<IMaestroTask>>();
 
-        public Maestro(bool verbose = false)
-        {
-            Verbose = true;
-        }
-
         public void Add(IMaestroTask task, params IMaestroTask[] dependencies)
         {
             if (!maestroTaskDependencyMap.ContainsKey(task))
-            {
                 maestroTaskDependencyMap.Add(task, new List<IMaestroTask>());
-            }
 
             foreach (IMaestroTask dependency in dependencies)
             {
-                if (maestroTaskDependencyMap.TryGetValue(dependency, out List<IMaestroTask> dependencyTasks))
+                List<IMaestroTask> cyclePath = GetDependencyPath(dependency, task);
+                if (cyclePath != null)
                 {
-                    if (dependencyTasks.Contains(task))
-                        throw new InvalidOperationException($"{task.GetType()} cannot be added because a circular reference would occur");
+                    List<string> cycleTasks = cyclePath.Select(t => t.GetType().Name).ToList();
+                    cycleTasks.Add(task.GetType().Name);
+                    string cycleMessage = string.Join(" -> ", cycleTasks);
+                    throw new InvalidOperationException(
+                        $"Adding a dependency from {task.GetType().Name} to {dependency.GetType().Name} would create a cyclic dependency: {cycleMessage}");
                 }
                 
                 if (!maestroTaskDependencyMap[task].Contains(dependency))
@@ -76,14 +72,13 @@ namespace LegendaryTools.Maestro
                 }
             }
             
-            List<MaestroTaskInfo> allReady = allMaestroNodes.FindAll(item => item.HasPrerequisites && !item.IsDone);
+            List<MaestroTaskInfo> allReady = allMaestroNodes.FindAll(item => item.HasPrerequisites && !item.IsDone && item.Enabled);
             bool repeat = !IsAllDone(allMaestroNodes);
             while (repeat)
             {
                 List<Task> runningTasks = new List<Task>(allReady.Count);
                 foreach (MaestroTaskInfo maestroNode in allReady)
                 {
-                    maestroNode.Verbose = Verbose;
                     maestroNode.OnTaskCompleted += OnTaskCompleted;
                     runningTasks.Add(maestroNode.DoTaskOperation());
                 }
@@ -95,12 +90,47 @@ namespace LegendaryTools.Maestro
                 if (repeat && allReady.Count == 0)
                 {
                     OnFinished?.Invoke(this, false);
-                    Debug.LogError("Unable to get the next step to get the references, no Task has the requirements to run.");
+                    Debugger.LogError<Maestro>("Maestro execution could not continue because no tasks were ready, no tasks had their" +
+                                   " prerequisites completed. This usually occurs due to cyclic dependencies.");
                     return;
                 }
             }
 
             OnFinished?.Invoke(this, IsSuccess(allMaestroNodes));
+        }
+
+        private List<IMaestroTask> GetDependencyPath(IMaestroTask startTask, IMaestroTask targetTask)
+        {
+            // Perform a depth-first search to find a path from startTask to targetTask
+            HashSet<IMaestroTask> visited = new HashSet<IMaestroTask>();
+            Stack<(IMaestroTask task, List<IMaestroTask> path)> stack =
+                new Stack<(IMaestroTask task, List<IMaestroTask> path)>();
+            stack.Push((startTask, new List<IMaestroTask> { startTask }));
+
+            while (stack.Count > 0)
+            {
+                (IMaestroTask currentTask, List<IMaestroTask> path) = stack.Pop();
+
+                if (currentTask == targetTask)
+                {
+                    return path;
+                }
+
+                if (!visited.Contains(currentTask))
+                {
+                    visited.Add(currentTask);
+                    if (maestroTaskDependencyMap.TryGetValue(currentTask, out List<IMaestroTask> dependencies))
+                    {
+                        foreach (IMaestroTask dep in dependencies)
+                        {
+                            List<IMaestroTask> newPath = new List<IMaestroTask>(path) { dep };
+                            stack.Push((dep, newPath));
+                        }
+                    }
+                }
+            }
+
+            return null;
         }
 
         private bool IsAllDone(List<MaestroTaskInfo> allMaestroNodes)

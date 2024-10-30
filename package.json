@@ -2,7 +2,7 @@
   "name": "com.legustavinho.legendary-tools-maestro",
   "displayName": "Legendary Tools - Maestro",
   "description": "Generic Dependency Tree Resolver, you can create an initialization tree of services/modules/systems where each, where probably one or more services depend on others and cannot be initialized while its dependent is not.",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "unity": "2019.4",
   "keywords": [],
   "category": "Extensions",
@@ -14,7 +14,7 @@
   "dependencies": {
     "com.legustavinho.legendary-tools-graphs": "1.0.2",
     "com.legustavinho.legendary-tools-singleton": "1.0.2",
-    "com.legustavinho.legendary-tools-common": "1.1.1",
+    "com.legustavinho.legendary-tools-common": "1.3.1",
     "com.unity.test-framework": "1.3.9"
   },
   "author": {

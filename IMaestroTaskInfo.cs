@@ -6,6 +6,7 @@ namespace LegendaryTools.Maestro
 {
     public interface IMaestroTaskInfo
     {
+        bool Enabled { get; }
         bool IsRunning { get; }
         bool IsCompleted { get; }
         bool HasError { get; }

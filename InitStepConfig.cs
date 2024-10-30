@@ -5,14 +5,21 @@ using UnityEngine;
 
 namespace LegendaryTools.Maestro
 {
-    public abstract class InitStepConfig : 
-#if ODIN_INSPECTOR
-        Sirenix.OdinInspector.SerializedScriptableObject,
-#else
-        UnityEngine.ScriptableObject,
-#endif
-        IMaestroTaskWithDependency, IDisposable
+    public abstract class InitStepConfig : UnityObject, IMaestroTaskWithDependency, IDisposable
     {
+#if ODIN_INSPECTOR
+        [HideInInspector]
+#endif
+        [SerializeField] private bool enabled = true;
+#if ODIN_INSPECTOR
+        [Sirenix.OdinInspector.ShowInInspector]
+#endif
+        public bool Enabled
+        {
+            get => enabled;
+            set => enabled = value;
+        }
+        
 #if ODIN_INSPECTOR
         [HideInInspector]
 #endif
