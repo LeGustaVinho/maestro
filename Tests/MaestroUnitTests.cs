@@ -37,6 +37,16 @@ namespace MaestroTests
         }
     }
 
+    public class FakeMaestroTaskA : FakeMaestroTask
+    {
+    }
+    public class FakeMaestroTaskB : FakeMaestroTask
+    {
+    }
+    public class FakeMaestroTaskC : FakeMaestroTask
+    {
+    }
+
     [TestFixture]
     public class MaestroUnitTests
     {
@@ -458,6 +468,22 @@ namespace MaestroTests
             Assert.AreEqual(1, task1.ExecutionCount, "Task1 should be executed once.");
             Assert.AreEqual(1, task2.ExecutionCount, "Task2 should be executed once.");
             Assert.AreEqual(1, task3.ExecutionCount, "Task3 should be executed once.");
+        }
+        
+        // Test 20: Ensuring shared dependencies are not re-executed after initial execution
+        [Test]
+        public async Task IndirectCyclicDependency_ShouldThrowException()
+        {
+            // Arrange
+            Maestro maestro = new Maestro();
+            FakeMaestroTaskA task1 = new FakeMaestroTaskA();
+            FakeMaestroTaskB task2 = new FakeMaestroTaskB();
+            FakeMaestroTaskC task3 = new FakeMaestroTaskC();
+            
+            maestro.Add(task1, task2);
+            maestro.Add(task2, task3);
+
+            Assert.Throws<InvalidOperationException>(() => maestro.Add(task3, task1), "Task 1 and 3 has cyclic dependencies");
         }
     }
 }

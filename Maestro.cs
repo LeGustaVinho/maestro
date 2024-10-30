@@ -25,9 +25,9 @@ namespace LegendaryTools.Maestro
                 if (cyclePath != null)
                 {
                     List<string> cycleTasks = cyclePath.Select(t => t.GetType().Name).ToList();
-                    cycleTasks.Add(task.GetType().Name);
+                    cycleTasks.Add(cycleTasks[0]);
                     string cycleMessage = string.Join(" -> ", cycleTasks);
-                    throw new InvalidOperationException(
+                     throw new InvalidOperationException(
                         $"Adding a dependency from {task.GetType().Name} to {dependency.GetType().Name} would create a cyclic dependency: {cycleMessage}");
                 }
                 
