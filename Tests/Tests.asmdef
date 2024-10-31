@@ -4,7 +4,8 @@
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
-        "LegendaryTools.Maestro"
+        "LegendaryTools.Maestro",
+        "LegendaryTools.Common"
     ],
     "includePlatforms": [
         "Editor"

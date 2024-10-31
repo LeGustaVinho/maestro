@@ -2,13 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using Debug = UnityEngine.Debug;
 
 namespace LegendaryTools.Maestro
 {
     public class MaestroTaskInfo : IMaestroTaskInfo
     {
         public bool Enabled => MaestroTaskObject.Enabled;
+        public bool RequiresInternet => MaestroTaskObject.RequiresInternet;
         public bool IsRunning { get; private set; }
         public bool IsCompleted { get; private set; }
         public bool HasError { get; private set; }

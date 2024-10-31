@@ -13,6 +13,7 @@ namespace MaestroTests
         public bool Enabled { get; } = true;
         public int TimeOut { get; set; } = 0;
         public bool ThreadSafe { get; set; } = true;
+        public bool RequiresInternet { get; } = false;
         private readonly bool _shouldSucceed;
         private readonly int _executionTime;
 
@@ -472,7 +473,7 @@ namespace MaestroTests
         
         // Test 20: Ensuring shared dependencies are not re-executed after initial execution
         [Test]
-        public async Task IndirectCyclicDependency_ShouldThrowException()
+        public void IndirectCyclicDependency_ShouldThrowException()
         {
             // Arrange
             Maestro maestro = new Maestro();

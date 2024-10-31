@@ -46,6 +46,19 @@ namespace LegendaryTools.Maestro
             get => threadSafe;
         }
 
+#if ODIN_INSPECTOR
+        [HideInInspector]
+#endif
+        [SerializeField] private bool requiresInternet;
+#if ODIN_INSPECTOR
+        [Sirenix.OdinInspector.ShowInInspector]
+#endif
+        public bool RequiresInternet
+        {
+            set => requiresInternet = value;
+            get => requiresInternet;
+        }
+
         public IMaestroTask[] Dependencies 
         {
             get
