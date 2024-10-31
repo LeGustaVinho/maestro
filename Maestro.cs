@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using UnityEngine;
 
 namespace LegendaryTools.Maestro
 {
@@ -63,7 +62,7 @@ namespace LegendaryTools.Maestro
             if (shouldCheckInternetConnection)
             {
                 if(hasInternetProviders != null)
-                    hasInternet = await CheckInternetConnection(hasInternetProviders);
+                    hasInternet = await CheckInternetConnection();
                 else
                     Debugger.LogWarning<Maestro>("Some tasks requires internet but no internet provider checker has been added.", method: nameof(Start));
             }
@@ -98,23 +97,26 @@ namespace LegendaryTools.Maestro
                 if (repeat && allReady.Count == 0)
                 {
                     OnFinished?.Invoke(this, false);
-                    Debugger.LogError<Maestro>("Maestro execution could not continue because no tasks were ready, no tasks had their" +
-                                               " prerequisites completed. This usually occurs due to cyclic dependencies or broken/exception tasks.", method: nameof(Start));
-                    return;
+                    Debugger.LogWarning<Maestro>("Maestro execution could not continue because no tasks were ready, no tasks had their" +
+                                               " prerequisites completed. This usually occurs due to cyclic dependencies, " +
+                                               "broken/exception tasks, time outed tasks or tasks requires internet.", method: nameof(Start));
+                    break;
                 }
+            }
+            
+            if (!hasInternet)
+            {
+                List<MaestroTaskInfo> pendingInternetTasks = allMaestroNodes.FindAll(item =>
+                    item.HasPrerequisites && !item.IsDone && item.Enabled
+                    && item.RequiresInternet);
 
-                if (!hasInternet)
+                if (pendingInternetTasks.Count > 0)
                 {
-                    List<MaestroTaskInfo> pendingInternetTasks = allMaestroNodes.FindAll(item =>
-                        item.HasPrerequisites && !item.IsDone && item.Enabled
-                        && item.RequiresInternet);
-
-                    if (pendingInternetTasks.Count > 0)
-                    {
-                        Debugger.Log<Maestro>($"Maestro didn't finish all tasks because some requires internet connection, but we will retry when available.", 
-                            method: nameof(CheckInternetAvailabilityLoop));
-                        CheckInternetAvailabilityLoop();
-                    }
+                    string tasksWaitingInternet =
+                        string.Join(", ", pendingInternetTasks.Select(item => item.MaestroTaskObject.GetType().Name).ToArray());
+                    Debugger.Log<Maestro>($"Maestro didn't finish all tasks because {tasksWaitingInternet} requires internet connection, but we will retry when available.", 
+                        method: nameof(CheckInternetAvailabilityLoop));
+                    CheckInternetAvailabilityLoop();
                 }
             }
         }
@@ -222,7 +224,7 @@ namespace LegendaryTools.Maestro
             return true;
         }
 
-        private async Task<bool> CheckInternetConnection(InternetProviderChecker[] hasInternetProviders = null)
+        private async Task<bool> CheckInternetConnection()
         {
             if (hasInternetProviders == null) return false;
             List<Task<bool>> waitingTasks = new List<Task<bool>>(hasInternetProviders.Length);

@@ -14,7 +14,7 @@
   "dependencies": {
     "com.legustavinho.legendary-tools-graphs": "1.0.2",
     "com.legustavinho.legendary-tools-singleton": "1.0.2",
-    "com.legustavinho.legendary-tools-common": "1.3.1",
+    "com.legustavinho.legendary-tools-common": "1.3.2",
     "com.unity.test-framework": "1.3.9"
   },
   "author": {
